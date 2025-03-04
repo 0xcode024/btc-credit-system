@@ -1,0 +1,5 @@
+const CONFIRM_BLOCK_THRESHOLD = 0;
+
+module.exports = {
+  CONFIRM_BLOCK_THRESHOLD,
+};
