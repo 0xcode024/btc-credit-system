@@ -21,7 +21,7 @@ const playCoinFlip = async (req, res) => {
       user.balance.btc -= amount;
     }
 
-    await userService.updateUserBalance(user.id, user.balance); // Make sure this is implemented in your userService
+    await userService.updateUser(user.id, user);
 
     const historyData = {
       userAddress: user.userAddress,

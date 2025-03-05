@@ -12,8 +12,8 @@ const login = async (req, res) => {
     const { paymentAddress, paymentPubkey, message, signature, userInfo } =
       req.body;
     console.log(paymentAddress, message, signature, userInfo);
-    // const result = await verifyMessage(paymentPubkey, message, signature);
-    // if (!result) throw new Error("Invalid Signature");
+    const result = await verifyMessage(paymentPubkey, message, signature);
+    if (!result) throw new Error("Invalid Signature");
 
     let user = await UserService.findUser({ paymentAddress });
     if (!user) {
