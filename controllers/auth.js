@@ -16,6 +16,7 @@ const login = async (req, res) => {
     if (!result) throw new Error("Invalid Signature");
 
     let user = await UserService.findUser({ paymentAddress });
+    console.log("User=>", user);
     if (!user) {
       // throw new Error("User not found");
       user = await UserService.createUser(userInfo);

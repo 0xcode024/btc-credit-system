@@ -7,7 +7,7 @@ const {
 
 const { getUserById, updateUser } = require("../services/user");
 const { ADMIN_ADDRESS, NETWORK_TYPE } = process.env;
-const initTransactionWorker = async () => {
+const initTransactionWorker = async (io) => {
   try {
     const {
       bitcoin: { websocket },
@@ -29,18 +29,20 @@ const initTransactionWorker = async () => {
       if (dataObj["address-transactions"])
         // console.log("status", dataObj["address-transactions"][0].status);
         for (let transaction of dataObj["address-transactions"]) {
+          console.log("txs in mempool", transaction);
           if (transaction.status.confirmed) {
-            updateTransactionStatus(transaction.txId, "confirmed");
+            updateTransactionStatus(transaction.txid, "confirmed", io);
           } else {
-            updateTransactionStatus(transaction.txId, "pending");
+            updateTransactionStatus(transaction.txid, "pending", io);
           }
         }
       if (dataObj["block-transactions"]) {
         for (let transaction of dataObj["block-transactions"]) {
+          console.log("txs in mempool", transaction);
           if (transaction.status.confirmed) {
-            updateTransactionStatus(transaction.txId, "confirmed");
+            updateTransactionStatus(transaction.txid, "confirmed", io);
           } else {
-            updateTransactionStatus(transaction.txId, "pending");
+            updateTransactionStatus(transaction.txid, "pending", io);
           }
         }
       }
@@ -49,39 +51,56 @@ const initTransactionWorker = async () => {
       ws.send(JSON.stringify({ "track-address": ADMIN_ADDRESS }));
       console.log(`Transaction worker is tracking ${ADMIN_ADDRESS}...`);
     });
+    ws.on("error", (err) => {
+      console.error("WebSocket error:", err);
+    });
   } catch (error) {
     console.log(error);
   }
 };
 
-const updateTransactionStatus = async (txId, status) => {
-  let transaction = await findTransaction({ txId });
-  if (!transaction) {
-    return;
-  }
-  transaction.status = status;
-  if (status === "confirmed" && transaction.type === "deposit") {
-    const user = await getUserById(transaction.userId);
-    if (transaction.assetType === "BTC") {
-      user.balance.btc += transaction.assetAmount;
-    } else if (transaction.assetType === "Inscription") {
-      user.balance.inscriptions.push(transaction.assetId);
-    } else {
-      const rune = user.balance.runes.find(
-        (rune) => rune.id === transaction.assetId
-      );
-      if (rune) {
-        rune.amount += transaction.assetAmount;
-      } else {
-        user.balance.runes.push({
-          id: transaction.assetId,
-          amount: transaction.assetAmount,
-        });
-      }
+const updateTransactionStatus = async (txId, status, io) => {
+  try {
+    console.log("txid=>", txId);
+    let transaction = await findTransaction({ txId });
+    console.log("transaction=>", transaction);
+
+    if (!transaction) {
+      return;
     }
-    await updateUser(user._id, user);
+    transaction.status = status;
+    if (status === "confirmed" && transaction.type === "deposit") {
+      const user = await getUserById(transaction.userId);
+      console.log("user=>", user);
+
+      let message = "";
+      if (transaction.assetType === "BTC") {
+        user.balance.btc += transaction.assetAmount;
+        message = `${transaction.assetAmount} BTC deposited successfully.`;
+      } else if (transaction.assetType === "Inscription") {
+        user.balance.inscriptions.push(transaction.assetId);
+        message = `Inscription ${transaction.assetId} deposited successfully.`;
+      } else {
+        const rune = user.balance.runes.find(
+          (rune) => rune.id === transaction.assetId
+        );
+        if (rune) {
+          rune.amount += transaction.assetAmount;
+        } else {
+          user.balance.runes.push({
+            id: transaction.assetId,
+            amount: transaction.assetAmount,
+          });
+        }
+        message = `Rune ${transaction.assetId} (${transaction.assetAmount}) deposited successfully.`;
+      }
+      await updateUser(user._id, user);
+      io.emit("UpdateUser", { user, message });
+    }
+    await updateTransaction(transaction._id, transaction);
+  } catch (error) {
+    console.log(error);
   }
-  await updateTransaction(transaction._id, transaction);
 };
 
 module.exports = {

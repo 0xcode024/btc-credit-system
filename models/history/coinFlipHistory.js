@@ -17,6 +17,10 @@ const coinFlipHistorySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  payout: {
+    type: Number,
+    required: true, // How much the user won or lost
+  },
   win: {
     type: Boolean,
     required: true,

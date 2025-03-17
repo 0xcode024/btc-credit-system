@@ -5,6 +5,7 @@ const { hashPsbt } = require("../../utils/verifyPsbt");
 
 const getPsbtToDepositBTC = async (req, res) => {
   try {
+    console.log("req.user", req.user);
     const user = await userService.getUserById(req.user.id);
     const { amount } = req.body;
     console.log(user.paymentAddress, user.paymentPubkey);
@@ -16,6 +17,7 @@ const getPsbtToDepositBTC = async (req, res) => {
     console.log("result", result);
     const hash = hashPsbt(result.psbt.hex);
     await transactionService.createTransaction({
+      userId: req.user.id,
       hash: hash,
       type: "deposit",
       assetType: "BTC",

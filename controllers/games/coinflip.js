@@ -1,11 +1,13 @@
 const userService = require("../../services/user");
 const coinFlipHistoryService = require("../../services/coinFlipHistory");
+const { formatNumber } = require("../../utils/number");
 
 const playCoinFlip = async (req, res) => {
   try {
     const user = await userService.getUserById(req.user.id);
 
-    const { amount, bet } = req.body;
+    const { amount, bet, current } = req.body;
+    const num = Math.floor(Math.random() * 5) + 1;
 
     if (user.balance.btc < amount) {
       return res
@@ -13,31 +15,36 @@ const playCoinFlip = async (req, res) => {
         .json({ message: "Insufficient balance for this bet." });
     }
 
-    const result = Math.random() < 0.5 ? "heads" : "tails";
+    const result =
+      num % 2 === 0 ? current : current === "heads" ? "tails" : "heads";
 
     if (result === bet) {
-      user.balance.btc += amount;
+      user.balance.btc += Number(amount) * 0.92;
     } else {
-      user.balance.btc -= amount;
+      user.balance.btc -= Number(amount);
     }
 
     await userService.updateUser(user.id, user);
 
     const historyData = {
-      userAddress: user.userAddress,
+      userAddress: user.paymentAddress,
       bet,
       result,
       wager: amount,
+      payout: result == bet ? amount * 1.92 : amount,
       win: result === bet,
       winnings: result === bet ? amount : 0,
     };
 
     await coinFlipHistoryService.createHistory(historyData);
 
+    console.log("num", num);
+
     res.status(200).json({
       result,
       win: result === bet,
-      newBalance: user.balance.btc,
+      newBalance: formatNumber(user.balance.btc),
+      num,
     });
   } catch (error) {
     console.error("Error in playCoinFlip:", error);
@@ -47,10 +54,13 @@ const playCoinFlip = async (req, res) => {
 
 const getHistory = async (req, res) => {
   try {
-    const userAddress = req.params.userAddress;
-    const history = await coinFlipHistoryService.findHistory({ userAddress });
+    const { address } = req.params;
+    console.log("history address", address);
+    const history = await coinFlipHistoryService.findHistory({
+      userAddress: address,
+    });
     res.status(200).json({
-      userAddress,
+      userAddress: address,
       history,
     });
   } catch (error) {

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
-  userAddress: { type: String },
+  username: { type: String },
   balance: {
     btc: { type: Number, default: 0 },
     inscriptions: [{ type: String }],

@@ -4,8 +4,8 @@ const coinFlipController = require("../../controllers/games/coinflip");
 const { authenticate } = require("../../middlewares/auth");
 router.post("/play", authenticate, coinFlipController.playCoinFlip);
 router.get(
-  "/history/:userAddress",
-  authenticate,
+  "/history/:address",
+  // authenticate,
   coinFlipController.getHistory
 );
 

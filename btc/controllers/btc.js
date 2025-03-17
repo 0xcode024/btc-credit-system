@@ -12,6 +12,7 @@ const {
 const { getBtcUtxos } = require("../utils/utxos.js");
 const { addInputForFee, getFeeRate } = require("../utils/fee.js");
 const { hashPsbt } = require("../../utils/verifyPsbt.js");
+const { countNonPushOnlyOPs } = require("bitcoinjs-lib/src/script");
 
 // Initialize ECC Library
 bitcoinjs.initEccLib(ecc);
@@ -48,6 +49,8 @@ const depositBTC = async (payload) => {
   );
 
   const btcUtxos = await getBtcUtxos(paymentAddress, paymentPubkey);
+
+  console.log("btcUtxos", btcUtxos);
   const feeRate = await getFeeRate();
   const toSignInputs = {};
   const psbt = new Psbt({ network });

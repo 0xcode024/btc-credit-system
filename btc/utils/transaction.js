@@ -167,17 +167,15 @@ const getInputWithAddressType = (address, utxo) => {
       tapInternalKey: toXOnly(Buffer.from(utxo.pubkey, "hex")),
     };
   } else if (addressType.type === AddressType.p2wpkh) {
-    const redeemData = bitcoinjs.payments.p2wpkh({
-      pubkey: Buffer.from(utxo.pubkey, "hex"),
-    });
     return {
       hash: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
         value: BigInt(utxo.satoshis),
-        script: Buffer.from(utxo.scriptPk, "hex"),
+        script: bitcoinjs.payments.p2wpkh({
+          pubkey: Buffer.from(utxo.pubkey, "hex"),
+        }).output,
       },
-      redeemScript: redeemData.output,
     };
   } else if (addressType.type === AddressType.p2sh) {
     const redeemData = bitcoinjs.payments.p2wpkh({
