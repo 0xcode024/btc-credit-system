@@ -1,0 +1,13 @@
+[1mdiff --git a/controllers/games/coinflip.js b/controllers/games/coinflip.js[m
+[1mindex bd4bf81..172fdb1 100644[m
+[1m--- a/controllers/games/coinflip.js[m
+[1m+++ b/controllers/games/coinflip.js[m
+[36m@@ -42,6 +42,8 @@[m [mconst playCoinFlip = async (req, res) => {[m
+ [m
+     res.status(200).json({[m
+       result,[m
+[32m+[m[32m      amount,[m
+[32m+[m[32m      payout: result == bet ? amount * 1.92 : -amount,[m
+       win: result === bet,[m
+       newBalance: formatNumber(user.balance.btc),[m
+       num,[m
