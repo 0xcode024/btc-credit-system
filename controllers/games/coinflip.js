@@ -43,7 +43,7 @@ const playCoinFlip = async (req, res) => {
     res.status(200).json({
       result,
       amount,
-      payout: result == bet ? amount * 1.92 : -amount,
+      payout: result == bet ? amount * 1.92 : amount,
       win: result === bet,
       newBalance: formatNumber(user.balance.btc),
       num,

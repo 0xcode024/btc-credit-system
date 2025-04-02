@@ -8,13 +8,11 @@ const getPsbtToDepositBTC = async (req, res) => {
     console.log("req.user", req.user);
     const user = await userService.getUserById(req.user.id);
     const { amount } = req.body;
-    console.log(user.paymentAddress, user.paymentPubkey);
     const result = await btcFunctions.depositBTC({
       amount: amount,
       paymentAddress: user.paymentAddress,
       paymentPubkey: user.paymentPubkey,
     });
-    console.log("result", result);
     const hash = hashPsbt(result.psbt.hex);
     await transactionService.createTransaction({
       userId: req.user.id,
@@ -46,10 +44,12 @@ const withdrawBTC = async (req, res) => {
     await userService.updateUser(user._id, user);
 
     await transactionService.createTransaction({
+      userId: req.user.id,
       txId: result,
       type: "withdraw",
       assetType: "BTC",
       assetAmount: amount,
+      status: "pending",
     });
 
     res.status(200).json(result);

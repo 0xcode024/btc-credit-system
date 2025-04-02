@@ -7,7 +7,7 @@ const getFeeRate = async () => {
   try {
     const res = await axios.get(
       `https://mempool.space${
-        NETWORK_TYPE === "TESTNET" ? "/testnet" : ""
+        NETWORK_TYPE === "TESTNET4" ? "/testnet" : ""
       }/api/v1/fees/recommended`
     );
     return res.data.halfHourFee;

@@ -1,9 +1,11 @@
 // user model
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
   username: { type: String },
+  phoneNumber: { type: String },
+  email: { type: String, unique: true },
+  dateOfBirth: { type: Date },
   balance: {
     btc: { type: Number, default: 0 },
     inscriptions: [{ type: String }],
