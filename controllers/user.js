@@ -22,7 +22,9 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
+    console.log("id", req.params.id);
     const user = await userService.getUserById(req.params.id);
+
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json(user);
   } catch (error) {
@@ -32,8 +34,11 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const user = await userService.updateUser(req.params.id, req.body);
+    const { username, phoneNumber, email, dateOfBirth } = req.body;
+    let user = await userService.getUserById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
+    let newfield = { username, phoneNumber, email, dateOfBirth };
+    user = await userService.updateUser(req.user.id, newfield);
     res.status(200).json(user);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -42,7 +47,7 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const user = await userService.deleteUser(req.params.id);
+    const user = await userService.deleteUser(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
@@ -52,7 +57,6 @@ const deleteUser = async (req, res) => {
 
 const getUserInfo = async (req, res) => {
   try {
-    console.log("user", req.user);
     const user = await userService.getUserById(req.user.id);
     res.status(200).json(user);
   } catch (error) {
@@ -60,7 +64,7 @@ const getUserInfo = async (req, res) => {
   }
 };
 
-const getUserByPaymentAddress = async (req, res) => {
+const getUserByAddress = async (req, res) => {
   try {
     const { address } = req.params;
     console.log("address", address);
@@ -79,5 +83,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserInfo,
-  getUserByPaymentAddress,
+  getUserByAddress,
 };
