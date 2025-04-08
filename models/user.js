@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   username: { type: String },
   phoneNumber: { type: String },
-  email: { type: String, unique: true },
+  email: { type: String },
   dateOfBirth: { type: Date },
   balance: {
     btc: { type: Number, default: 0 },
