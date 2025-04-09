@@ -48,9 +48,7 @@ const initTransactionWorker = async (io) => {
             }
           }
         } catch (error) {
-          console.log("========================================");
           console.log(error);
-          console.log("========================================");
         }
       });
       ws.on("open", () => {
@@ -58,18 +56,14 @@ const initTransactionWorker = async (io) => {
           ws.send(JSON.stringify({ "track-address": ADMIN_ADDRESS }));
           console.log(`Transaction worker is tracking ${ADMIN_ADDRESS}...`);
         } catch (error) {
-          console.log("----------------------------------------");
           console.log(error);
-          console.log("----------------------------------------");
         }
       });
       ws.on("error", (err) => {
         console.error("WebSocket error:", err);
-        // setTimeout(connectWebSocket, 5000);
       });
       ws.on("close", () => {
         console.warn("WebSocket connection closed, reconnecting...");
-        // setTimeout(connectWebSocket, 5000);
       });
     };
     connectWebSocket();
@@ -92,7 +86,6 @@ const updateTransactionStatus = async (txId, status, io) => {
     let message = "";
     if (status === "confirmed" && transaction.type === "deposit") {
       const user = await getUserById(transaction.userId);
-      console.log("user=>", user);
 
       if (!user) return;
       if (transaction.assetType === "BTC") {
@@ -121,7 +114,6 @@ const updateTransactionStatus = async (txId, status, io) => {
       io.emit("UpdateUser", { user, message });
     } else if (status === "confirmed" && transaction.type === "withdraw") {
       const user = await getUserById(transaction.userId);
-      console.log("user=>", user);
       if (!user) return;
       if (transaction.assetType === "BTC") {
         user.balance.btc -= transaction.assetAmount;

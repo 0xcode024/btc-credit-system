@@ -50,7 +50,6 @@ const depositBTC = async (payload) => {
 
   const btcUtxos = await getBtcUtxos(paymentAddress, paymentPubkey);
 
-  console.log("btcUtxos", "......");
   const feeRate = await getFeeRate();
   const toSignInputs = {};
   const psbt = new Psbt({ network });
@@ -72,7 +71,6 @@ const depositBTC = async (payload) => {
     feeRate,
     -amount
   );
-  console.log("psbt:", { psbt });
 
   return {
     psbt: {

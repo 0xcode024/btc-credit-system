@@ -22,7 +22,6 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    console.log("id", req.params.id);
     const user = await userService.getUserById(req.params.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -67,7 +66,6 @@ const getUserInfo = async (req, res) => {
 const getUserByAddress = async (req, res) => {
   try {
     const { address } = req.params;
-    console.log("address", address);
     const user = await userService.findUser({ paymentAddress: address });
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json(user);

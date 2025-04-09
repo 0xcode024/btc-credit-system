@@ -11,12 +11,10 @@ const login = async (req, res) => {
   try {
     const { paymentAddress, paymentPubkey, message, signature, userInfo } =
       req.body;
-    console.log(paymentAddress, message, signature, userInfo);
     const result = await verifyMessage(paymentPubkey, message, signature);
     if (!result) throw new Error("Invalid Signature");
 
     let user = await UserService.findUser({ paymentAddress });
-    console.log("User=>", user);
     if (!user) {
       // throw new Error("User not found");
       user = await UserService.createUser(userInfo);
@@ -35,7 +33,6 @@ const login = async (req, res) => {
     );
     res.status(200).json({ user, token });
   } catch (error) {
-    console.log("LOGIN ERROR");
     console.log(error);
     res.status(400).json({ message: error.message });
   }

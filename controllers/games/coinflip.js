@@ -38,8 +38,6 @@ const playCoinFlip = async (req, res) => {
 
     await coinFlipHistoryService.createHistory(historyData);
 
-    console.log("num", num);
-
     res.status(200).json({
       result,
       amount,
@@ -49,7 +47,7 @@ const playCoinFlip = async (req, res) => {
       num,
     });
   } catch (error) {
-    console.error("Error in playCoinFlip:", error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -57,7 +55,6 @@ const playCoinFlip = async (req, res) => {
 const getHistory = async (req, res) => {
   try {
     const { address } = req.params;
-    console.log("history address", address);
     const history = await coinFlipHistoryService.findHistory({
       userAddress: address,
     });
@@ -66,7 +63,7 @@ const getHistory = async (req, res) => {
       history,
     });
   } catch (error) {
-    console.error("Error in getHistory:", error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error." });
   }
 };

@@ -16,7 +16,7 @@ const getPsbtToDepositRune = async (req, res) => {
       ordinalAddress: user.ordinalAddress,
       ordinalPubkey: user.ordinalPubkey,
     });
-    // console.log("txid:", result.psbt.txId);
+
     await transactionService.createTransaction({
       txId: hashPsbt(result.psbt.hex),
       type: "deposit",
@@ -47,7 +47,6 @@ const withdrawRune = async (req, res) => {
       receiveAddress: user.ordinalAddress,
     });
 
-    console.log("txid:", result);
     await userService.updateUser(user._id, user);
 
     await transactionService.createTransaction({
